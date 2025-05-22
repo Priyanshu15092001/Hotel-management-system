@@ -4,6 +4,8 @@ dotenv.config();
 const cors = require("cors");
 const connectToDb = require("./config/db");
 
+const menuRoutes = require('./routes/menuRoutes')
+
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -11,6 +13,8 @@ app.use(cors({ origin: "*", methods: "GET,POST,PUT,DELETE" }));
 app.use(express.json());
 
 //routes
+
+app.use('/api/menu',menuRoutes)
 
 //connect to db and start server
 connectToDb();
