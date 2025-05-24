@@ -54,3 +54,24 @@
 .searchbar input::placeholder {
   color: #6b6b6b;
 }
+
+@media(min-width:768px){
+  .title h1 {
+    font-size: 1.7rem;
+}
+
+.title h3 {
+  font-size: 1.2rem;
+}
+
+
+.searchbar img {
+  object-fit: contain;
+  width: 4%;
+}
+
+.searchbar input {
+  font-size: 1.2rem;
+}
+
+}
