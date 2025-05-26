@@ -5,6 +5,8 @@ import Analytics from "./components/Analytics/Analytics";
 import SeatingArrangement from "./components/SeatingArrangement/SeatingArrangement";
 import Orders from "./components/Orders/Orders";
 import Menu from "./components/Menu/Menu";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <div className="App">
@@ -18,6 +20,14 @@ function App() {
           </Route>
         </Routes>
       </Router>
+       <ToastContainer
+        position="top-center"
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        autoClose={3000}
+      /> 
     </div>
   );
 }

@@ -6,13 +6,13 @@ import { useState } from "react";
 import MenuCard from "../MenuCard/MenuCard";
 import filters from '../../data/filters'
 import FilterCard from "../FilterCard/FilterCard";
+import { toast } from "react-toastify";
 
 export default function Menu() {
   const [items, setItems] = useState([]);
   const [selectedCard, setSelectedCard] = useState(-1);
 
   const [searchedMenu, setSearchedMenu] = useState([]);
-  const [filterTickets, setFilterTickets] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
 
@@ -32,15 +32,7 @@ export default function Menu() {
   }, [searchQuery, items]);
 
 
-  // useEffect(() => {
-  //   if (activeTab === "all") {
-  //     setFilterTickets(searchedTickets);
-  //   } else {
-  //     setFilterTickets(
-  //       searchedTickets.filter((ticket) => ticket.status === activeTab)
-  //     );
-  //   }
-  // }, [activeTab, searchedTickets]);
+ 
 
   useEffect(() => {
     const category = selectedCard == -1 ? "" : filters[selectedCard].type;
@@ -51,9 +43,13 @@ export default function Menu() {
           setItems(data.item);
           setSearchedMenu(data.item)
         }
+        else{
+          toast.error(data.message)
+        }
       })
       .catch((error) => {
         console.error(error);
+        toast.error(error)
       });
   }, [selectedCard]);
 

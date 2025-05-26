@@ -1,0 +1,57 @@
+.card{
+    align-self: flex-start;
+    width: 7vw;
+    min-width: 10rem;
+    aspect-ratio: 1/1;
+    background-color: #f0f5f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 10px;
+}
+
+.deleteBtn{
+    position: absolute;
+    right: 4%;
+    top: 4%;
+    width: 15%;
+}
+
+.tableName{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.tableName h3{
+    font-family: "Poppins",sans-serif;
+    font-weight: 500;
+    font-size: clamp(2rem,1.6vw,2.6rem);
+    /* font-size: 2.2rem; */
+}
+
+.tableName span{
+    font-family: "Lato",sans-serif;
+    font-size: clamp(2.7rem,2.8vw,3.8rem);
+    /* font-size: 3.3rem; */
+}
+
+.occupancy{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: absolute;
+    right: 4%;
+    bottom: 4%;
+}
+
+.occupancy img{
+    width: 40%;
+}
+
+.occupancy span{
+    font-size: 80%;
+}
