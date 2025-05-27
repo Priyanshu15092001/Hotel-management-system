@@ -1,27 +1,34 @@
-
-const Order= require('../models/Order')
-const Menu= require('../models/Menu')
+const Order = require("../models/Order");
+const Menu = require("../models/Menu");
+const Table = require("../models/Table");
+const { findOptimalTableCombination } = require("../utils/tableAllocator");
 
 const placeOrder = async (req, res) => {
   try {
-    const { phone, address, items, deliveryTime, totalPrice, diningType } =
-      req.body;
+    const { customer, items, deliveryTime, totalPrice, diningType } = req.body;
 
-    if (!phone || !items || !deliveryTime || !totalPrice || !diningType) {
+    if (
+      !customer.name ||
+      !customer.phone ||
+      !items ||
+      !deliveryTime ||
+      !totalPrice ||
+      !diningType
+    ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     // Address is required only for takeaway
-    if (diningType === "Take Away" && !address) {
+    if (diningType === "Take Away" && !customer.address) {
       return res
         .status(400)
         .json({ message: "Address is required for Take Away orders" });
+    } else if (diningType === "Dine in" && !customer.count) {
+      return res.status(400).json({ message: "Total chair count is required" });
     }
 
     if (!Array.isArray(items) || items.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Items must be a non-empty array" });
+      return res.status(400).json({ message: "No food is selected" });
     }
 
     // Validate all menu items exist
@@ -29,7 +36,7 @@ const placeOrder = async (req, res) => {
       if (!item.menuItem || !item.quantity) {
         return res
           .status(400)
-          .json({ message: "Each item must include a menuItem and quantity" });
+          .json({ message: "User should select food item and quantity" });
       }
 
       const exists = await Menu.findById(item.menuItem);
@@ -40,17 +47,49 @@ const placeOrder = async (req, res) => {
       }
     }
 
+    if (diningType === "Dine in") {
+      const availableTables = await Table.find({ status: "Available" });
+
+      const sortedTables = availableTables.sort(
+        (a, b) => b.occupancy - a.occupancy
+      );
+
+      const optimalCombo = findOptimalTableCombination(
+        sortedTables,
+        customer.count
+      );
+
+      if (!optimalCombo) {
+        return res.status(400).json({ message: "Not enough available seats." });
+      }
+
+      var tableIds = optimalCombo.map((t) => t._id);
+
+      var tableNo = optimalCombo.map((t) => t.tableId);
+
+      console.log(tableIds, tableNo);
+    }
+
     const newOrder = new Order({
-      phone,
-      address: diningType === "Take Away" ? address : undefined,
+      customer,
       items,
+      tableBooked: diningType === "Dine in" ? tableNo : [],
       deliveryTime,
       totalPrice,
       diningType,
     });
 
     const savedOrder = await newOrder.save();
-    res.status(201).json({message:"Order Confirmed!",savedOrder});
+
+    if (diningType === "Dine in") {
+      // Reserve the selected tables
+      await Table.updateMany(
+        { _id: { $in: tableIds } },
+        { $set: { status: "Reserved" } }
+      );
+    }
+
+    return res.status(201).json({ message: "Order Confirmed!", savedOrder });
   } catch (err) {
     res
       .status(500)
@@ -58,6 +97,47 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const getOrders=async(req,res)=>{
+  try {
+    const orders = await Order.find().sort({createdAt:-1})
+    return res.status(200).json({message:"All orders fetched",orders})
+  } catch (error) {
+    return res.status(500).json({message:"Internal Server Error"})
+    console.error(error);
+    
+  }
+}
+
+
+const updateOrderStatus=async(req,res)=>{
+  try {
+    const {status} =req.query
+    const {id}=req.params
+    let updatedOrder
+    const order = await Order.findById(id)
+
+    if(!order)
+      return res.status(404).json({message:"Order not found"})
+
+    if(order.status==="Processing"){
+      order.status=status
+      updatedOrder=await order.save()
+      return res.status(200).json({message:"Order status changed",updatedOrder})
+    }
+
+    else{
+      return res.status(400).json({message:"Order is already complete"})
+    }
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({message:'Internal Server Error'})
+    
+  }
+}
+
 module.exports = {
   placeOrder,
+  getOrders,
+  updateOrderStatus
 };

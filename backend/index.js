@@ -11,7 +11,7 @@ const tableRoutes = require('./routes/tableRoutes')
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(cors({ origin: "*", methods: "GET,POST,PUT,DELETE" }));
+app.use(cors({ origin: "*", methods: "GET,POST,PUT,DELETE,PATCH" }));
 app.use(express.json());
 
 //routes
