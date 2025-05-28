@@ -91,7 +91,7 @@ const placeOrder = async (req, res) => {
       estimatedDuration
     );
 
-    console.log(assignedChefId);
+    // console.log(assignedChefId);
 
     if (!assignedChefId) {
       return res.status(400).json({ message: "Failed to assign chef" });
@@ -121,8 +121,8 @@ const getOrders = async (req, res) => {
     const orders = await Order.find().sort({ createdAt: -1 });
     return res.status(200).json({ message: "All orders fetched", orders });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
     console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

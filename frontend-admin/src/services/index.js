@@ -108,3 +108,30 @@ export async function updateTableStatus(id,status){
     throw error
   }
 }
+
+export async function getAllChef(){
+  try {
+    const res= await fetch(`${URL}/api/chefs`,{
+      method:'GET'
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
+
+export async function getOverallSummary(){
+  try {
+    const res= await fetch(`${URL}/api/analytics`,{
+      method:'GET'
+    })
+
+    return res
+
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
