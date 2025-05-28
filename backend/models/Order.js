@@ -67,6 +67,8 @@ const orderSchema = new mongoose.Schema(
       enum: ["Done", "Processing", "Served", "Not Picked Up"],
       default: "Processing",
     },
+
+    assignedChef: { type: mongoose.Schema.Types.ObjectId, ref: "Chef" },
   },
   { timestamps: true }
 );

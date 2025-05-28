@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Menu = require("../models/Menu");
 const Table = require("../models/Table");
 const { findOptimalTableCombination } = require("../utils/tableAllocator");
+const {assignChefToOrder,removeOrderFromChef} = require("../utils/assignChefToOrder");
 
 const placeOrder = async (req, res) => {
   try {
@@ -66,11 +67,9 @@ const placeOrder = async (req, res) => {
       var tableIds = optimalCombo.map((t) => t._id);
 
       var tableNo = optimalCombo.map((t) => t.tableId);
-
-      console.log(tableIds, tableNo);
     }
 
-    const newOrder = new Order({
+    const newOrder = await Order.create({
       customer,
       items,
       tableBooked: diningType === "Dine in" ? tableNo : [],
@@ -79,7 +78,27 @@ const placeOrder = async (req, res) => {
       diningType,
     });
 
-    const savedOrder = await newOrder.save();
+    // const savedOrder = await newOrder.save();
+
+    const estimatedDuration = Math.ceil(
+      (new Date(newOrder.deliveryTime) - new Date()) / (1000 * 60)
+    );
+
+    if (estimatedDuration < 1) estimatedDuration = 1;
+
+    const assignedChefId = await assignChefToOrder(
+      newOrder._id,
+      estimatedDuration
+    );
+
+    console.log(assignedChefId);
+
+    if (!assignedChefId) {
+      return res.status(400).json({ message: "Failed to assign chef" });
+    }
+    // Update order
+    newOrder.assignedChef = assignedChefId;
+    await newOrder.save();
 
     if (diningType === "Dine in") {
       // Reserve the selected tables
@@ -89,55 +108,51 @@ const placeOrder = async (req, res) => {
       );
     }
 
-    return res.status(201).json({ message: "Order Confirmed!", savedOrder });
+    return res.status(201).json({ message: "Order Confirmed!", newOrder });
   } catch (err) {
-    res
+    return res
       .status(500)
       .json({ message: "Failed to place order", error: err.message });
   }
 };
 
-const getOrders=async(req,res)=>{
+const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find().sort({createdAt:-1})
-    return res.status(200).json({message:"All orders fetched",orders})
+    const orders = await Order.find().sort({ createdAt: -1 });
+    return res.status(200).json({ message: "All orders fetched", orders });
   } catch (error) {
-    return res.status(500).json({message:"Internal Server Error"})
+    return res.status(500).json({ message: "Internal Server Error" });
     console.error(error);
-    
   }
-}
+};
 
-
-const updateOrderStatus=async(req,res)=>{
+const updateOrderStatus = async (req, res) => {
   try {
-    const {status} =req.query
-    const {id}=req.params
-    let updatedOrder
-    const order = await Order.findById(id)
+    const { status } = req.query;
+    const { id } = req.params;
+    let updatedOrder;
+    const order = await Order.findById(id);
 
-    if(!order)
-      return res.status(404).json({message:"Order not found"})
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-    if(order.status==="Processing"){
-      order.status=status
-      updatedOrder=await order.save()
-      return res.status(200).json({message:"Order status changed",updatedOrder})
+    if (order.status === "Processing") {
+      order.status = status;
+      updatedOrder = await order.save();
+      await removeOrderFromChef(order._id);
+      return res
+        .status(200)
+        .json({ message: "Order status changed", updatedOrder });
+    } else {
+      return res.status(400).json({ message: "Order is already complete" });
     }
-
-    else{
-      return res.status(400).json({message:"Order is already complete"})
-    }
-
   } catch (error) {
     console.error(error);
-    return res.status(500).json({message:'Internal Server Error'})
-    
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 module.exports = {
   placeOrder,
   getOrders,
-  updateOrderStatus
+  updateOrderStatus,
 };
