@@ -135,3 +135,31 @@ export async function getOverallSummary(){
     throw error
   }
 }
+
+export async function getOrderSummary(range){
+    const query = new URLSearchParams({ range });
+  try {
+    const res= await fetch(`${URL}/api/analytics/order-summary?${query}`,{
+      method:'GET'
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
+
+export async function getRevenueSummary(range){
+    const query = new URLSearchParams({ range });
+  try {
+    const res= await fetch(`${URL}/api/analytics/revenue-growth?${query}`,{
+      method:'GET'
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
