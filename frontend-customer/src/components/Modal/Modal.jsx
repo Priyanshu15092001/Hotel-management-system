@@ -6,6 +6,7 @@ const InstructionModal = ({
   onClose,
   instructions,
   setInstructions,
+  onSubmitInstructions
 }) => {
   return (
     <>
@@ -42,7 +43,7 @@ const InstructionModal = ({
             >
               Cancel
             </button>
-            <button onClick={onClose}>Next</button>
+            <button onClick={onSubmitInstructions}>Next</button>
           </div>
         </div>
       </div>
@@ -53,10 +54,9 @@ const InstructionModal = ({
 const InputModal = ({
   isOpen,
   onClose,
-  userPhone,
-  setUserPhone,
-  userAddress,
-  setUserAddress,
+  onSubmitDetails,
+  customer,
+  setCustomer,
   selected,
 }) => {
   return (
@@ -66,18 +66,39 @@ const InputModal = ({
         <img
           src={closeBtn}
           className={styles.closeBtn}
-          onClick={onClose}
+          onClick={()=>{onClose(); setCustomer({name:"",phone:"",address:"",count:1})}}
           alt=""
         />
         <div className={styles.inputContent}>
           <h2>User Details</h2>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="userName">Name</label>
+            <input
+              type="text"
+              name="userName"
+              value={customer.name}
+              onChange={(e) =>
+                setCustomer((prev) => ({
+                  ...prev,
+                  name: e.target.value,
+                }))
+              }
+            />
+          </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="userPhone">Phone</label>
             <input
               type="text"
               name="userPhone"
-              value={userPhone}
-              onChange={(e) => setUserPhone(e.target.value)}
+              value={customer.phone}
+              onChange={(e) =>
+                setCustomer((prev) => ({
+                  ...prev,
+                  phone: e.target.value,
+                }))
+              }
             />
           </div>
           {selected === "Take Away" ? (
@@ -86,25 +107,43 @@ const InputModal = ({
               <input
                 type="text"
                 name="userAddress"
-                value={userAddress}
-                onChange={(e) => setUserAddress(e.target.value)}
+                value={customer.address}
+                onChange={(e) =>
+                  setCustomer((prev) => ({
+                    ...prev,
+                    address: e.target.value,
+                  }))
+                }
               />
             </div>
           ) : (
-            <></>
+            <div className={styles.formGroup}>
+              <label htmlFor="userCount">No. of persons</label>
+              <input
+                type='number'
+                min={1}
+                name="userCount"
+                value={customer.count}
+                onChange={(e) =>
+                  setCustomer((prev) => ({
+                    ...prev,
+                    count: e.target.value,
+                  }))
+                }
+              />
+            </div>
           )}
           <div className={styles.buttons}>
             <button
               onClick={() => {
-                setUserPhone("");
-                setUserAddress("");
+                setCustomer({name:"",phone:"",address:"",count:0})
                 onClose();
               }}
               className={styles.cancel}
             >
               Cancel
             </button>
-            <button onClick={onClose} className={styles.submit}>
+            <button onClick={onSubmitDetails} className={styles.submit}>
               Submit
             </button>
           </div>

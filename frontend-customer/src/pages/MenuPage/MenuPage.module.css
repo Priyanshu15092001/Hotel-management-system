@@ -1,73 +1,80 @@
 .menuPage {
   height: 100dvh;
-  padding: 1rem;
+  /* padding: 1rem; */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
 }
-
 
 .filters {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 100;
+  padding: 10px 1rem;
 }
 
-
-.menuContainer{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    gap: 1rem;
+.menuContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* overflow: hidden; */
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
-.menuContainer h1{
-  font-family: "Roboto",sans-serif;
+.menuContainer h1 {
+  font-family: "Roboto", sans-serif;
   color: #2f2f2f;
   line-height: 38px;
-  font-size: clamp(2rem,7.5vw,2.5rem);
-
+  font-size: clamp(2rem, 7.5vw, 2.5rem);
 }
 
-.menuItems{
-    /* flex: 1; */
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 1rem;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
+.menuItems {
+  /* flex: 1; */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  /* overflow-y: auto;
+    overflow-x: hidden; */
 }
 
-.nextBtn{
-    padding-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+.nextBtn {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
 }
 
-.nextBtn button{
-    border: none;
-    background-color: #505050;
-    color: #fefefe;
-    font-family: "Inter",sans-serif;
-    padding: 1rem 4rem 1rem 4rem;
-    border-radius: 20px;
-    font-size: 1rem;
+.nextBtn button {
+  border: none;
+  background-color: #505050;
+  color: #fefefe;
+  font-family: "Inter", sans-serif;
+  padding: 1rem 4rem 1rem 4rem;
+  border-radius: 20px;
+  font-size: 1rem;
 }
 
-
-@media(min-width:768px){
-
-  .menuPage{
+@media (min-width: 768px) {
+  .menuPage {
     height: 100%;
   }
 
-  .menuContainer h1{
-    font-size: clamp(1.7rem,3vw,2rem);
+  .menuContainer h1 {
+    font-size: clamp(1.7rem, 3vw, 2rem);
   }
 }

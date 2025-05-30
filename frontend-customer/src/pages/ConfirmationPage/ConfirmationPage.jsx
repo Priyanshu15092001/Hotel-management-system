@@ -17,23 +17,33 @@ export default function ConfirmationPage() {
   const [confirmed, setConfirmed] = useState(
     localStorage.getItem("orderConfirmed" || false)
   );
-  const [selected, setSelected] = useState("Dine in");
+  const [selected, setSelected] = useState(
+    localStorage.diningType || "Dine in"
+  );
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(location.state?.cartItems || []);
-  const [userPhone, setUserPhone] = useState(
-    localStorage.getItem("userPhone") || ""
-  );
-  const [userAddress, setUserAddress] = useState(
-    localStorage.getItem("userAddress") || ""
-  );
-  const [totalPrice, setTotalPrice] = useState([0, 0, 0]); //[itemsPrice,tax,totalPrice]
+  // const [cartItems, setCartItems] = useState(location.state?.cartItems || []);
+  const[cartItems,setCartItems]= useState(JSON.parse(localStorage.getItem('cartItems'))||[])
+
+  const [customer, setCustomer] = useState({
+    name: JSON.parse(localStorage.getItem("customer"))?.name || "",
+    phone: JSON.parse(localStorage.getItem("customer"))?.phone || "",
+    address: JSON.parse(localStorage.getItem("customer"))?.address || "",
+    count: 1,
+  });
+
+  const [totalPrice, setTotalPrice] = useState(
+    JSON.parse(localStorage.getItem("totalPrice")) || {
+      itemsPrice: 0,
+      tax: 0,
+      totalPrice: 0,
+    }
+  ); //[itemsPrice,tax,totalPrice]
   const [duration, setDuration] = useState(
     localStorage.getItem("orderDuration") || 0
   );
-  const [instructions, setInstructions] = useState("");
-
+  const [instructions, setInstructions] = useState(localStorage.getItem('instructions')||'');
 
   useEffect(() => {
     if (cartItems.length == 0) {
@@ -41,10 +51,9 @@ export default function ConfirmationPage() {
     }
   }, [cartItems]);
 
-  // useEffect(() => {
-  //   setUserPhone(localStorage.getItem("userPhone")||"")
-  //   setUserAddress(localStorage.getItem("userAddress")||"")
-  // }, []);
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems,cartItems.quantity]);
 
   useEffect(() => {
     if (duration <= 0) return;
@@ -66,17 +75,30 @@ export default function ConfirmationPage() {
 
   useEffect(() => {
     setTotalPrice(calculatePrice());
-    setDuration(
-      localStorage.getItem("orderDuration") || calculateCookingTime()
-    );
+    // console.log('total price', calculatePrice());
+
+    localStorage.setItem("totalPrice", JSON.stringify(calculatePrice()));
+    // if (!localStorage.getItem("totalPrice"))
+    // setDuration(
+    //   localStorage.getItem("orderDuration") || calculateCookingTime()
+    // );
+
+    setDuration(calculateCookingTime())
+    localStorage.setItem('orderDuration',JSON.stringify(calculateCookingTime()))
+
   }, [cartItems, cartItems.quantity, selected]);
 
   const confirmOrder = () => {
     const details = {};
-    // console.log(userPhone);
-    
-    details.phone = userPhone;
-    details.address = userAddress;
+    // console.log(customer);
+
+    details.customer = JSON.parse(localStorage.getItem("customer"));
+    if (selected === "Take Away") {
+      delete details.customer.count;
+    } else {
+      delete details.customer.address;
+    }
+
     const items = [];
 
     cartItems.map((item) => {
@@ -89,13 +111,16 @@ export default function ConfirmationPage() {
       }
     });
     details.items = items;
-    details.instructions = instructions;
-    details.totalPrice = totalPrice[2];
+    details.instructions = localStorage.getItem('instructions');
+    details.totalPrice = JSON.parse(
+      localStorage.getItem("totalPrice")
+    ).totalPrice;
     details.diningType = selected;
     // console.log(duration);
-    
-    details.deliveryTime = new Date(new Date().getTime() + duration * 60000);
-    console.log(details);
+
+    // details.deliveryTime = new Date(new Date().getTime() + duration * 60000);
+    details.duration = localStorage.getItem('orderDuration');
+    // console.log(details);
 
     addOrder(details)
       .then(async (response) => {
@@ -107,8 +132,8 @@ export default function ConfirmationPage() {
           setConfirmed(true);
           localStorage.setItem("orderDuration", duration);
           localStorage.setItem("orderConfirmed", true);
-          localStorage.setItem("userPhone", userPhone);
-          localStorage.setItem("userAddress", userAddress);
+          // localStorage.setItem("customer", JSON.stringify(customer));
+          localStorage.setItem("diningType", selected);
           setSwipeText("Order Confirmed");
         } else {
           toast.error(data.message);
@@ -144,7 +169,8 @@ export default function ConfirmationPage() {
       totalPrice += 40; //delivery charge
     }
 
-    return [itemsPrice, tax, totalPrice];
+    return { itemsPrice, tax, totalPrice };
+    // return [itemsPrice, tax, totalPrice];
   };
 
   const updateQuantity = (itemId, newQuantity) => {
@@ -234,6 +260,28 @@ export default function ConfirmationPage() {
     navigate("/");
   };
 
+  const handleUserSubmit = (e) => {
+    e.preventDefault();
+
+    if (customer.name == "" || customer.phone == "") {
+      toast.error("Fill in all details");
+    }
+
+    if (selected === "Take Away") {
+      if (customer.address == "") toast.error("Fill in all details");
+    }
+
+    localStorage.setItem("customer", JSON.stringify(customer));
+
+    setIsOpenInputModal(false);
+  };
+
+  const handleInstructionSubmit=(e)=>{
+    e.preventDefault()
+    localStorage.setItem('instructions',instructions)
+    setIsOpen(false)
+  }
+
   return (
     <div className={styles.confirmPage}>
       <Header />
@@ -275,7 +323,7 @@ export default function ConfirmationPage() {
           <div className={styles.paymentDetails}>
             <div className={styles.charge}>
               <span>Item Total</span>
-              <span>₹ {totalPrice[0]}.00</span>
+              <span>₹ {totalPrice.itemsPrice}.00</span>
             </div>
             {selected === "Take Away" ? (
               <div className={styles.charge}>
@@ -295,11 +343,11 @@ export default function ConfirmationPage() {
 
             <div className={styles.charge}>
               <span>Taxes</span>
-              <span>₹ {totalPrice[1]}</span>
+              <span>₹ {totalPrice.tax}</span>
             </div>
             <div className={styles.chargeTotal}>
               <span>Grand Total</span>
-              <span>₹ {totalPrice[2]}</span>
+              <span>₹ {totalPrice.totalPrice}</span>
             </div>
           </div>
           <div
@@ -307,22 +355,14 @@ export default function ConfirmationPage() {
             onClick={() => (!confirmed ? setIsOpenInputModal(true) : undefined)}
           >
             <h2>Your details</h2>
-            {userPhone == "" ? (
+            {customer.phone == "" ? (
               <span>Click here to enter your details</span>
             ) : (
-              <></>
+              <div className={styles.details}>
+                <span>{customer.name}</span>, &nbsp;
+                <span>{customer.phone}</span>
+              </div>
             )}
-            <div className={styles.details}>
-              <span className={styles.ellipsis}>{userAddress}</span>
-              {selected === "Take Away" &&
-              userAddress != "" &&
-              userPhone != "" ? (
-                <span>,&nbsp;</span>
-              ) : (
-                <></>
-              )}
-              <span>{userPhone}</span>
-            </div>
           </div>
 
           <div className={styles.deliveryDetails}>
@@ -331,7 +371,7 @@ export default function ConfirmationPage() {
                 <img src={locationImg} alt="" />
                 <span>
                   Delivery at Home -{" "}
-                  <span className={styles.ellipsis}>{userAddress}</span>
+                  <span className={styles.ellipsis}>{customer.address}</span>
                 </span>
               </div>
             ) : (
@@ -380,15 +420,15 @@ export default function ConfirmationPage() {
       <InputModal
         isOpen={isOpenInputModal}
         onClose={() => setIsOpenInputModal(false)}
-        userPhone={userPhone}
-        setUserPhone={setUserPhone}
-        userAddress={userAddress}
-        setUserAddress={setUserAddress}
+        customer={customer}
+        setCustomer={setCustomer}
+        onSubmitDetails={handleUserSubmit}
         selected={selected}
       />
       <InstructionModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        onSubmitInstructions={handleInstructionSubmit}
         instructions={instructions}
         setInstructions={setInstructions}
       />
