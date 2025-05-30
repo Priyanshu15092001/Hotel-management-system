@@ -1,0 +1,10 @@
+.wrapper {
+  position: relative;
+  width: 428px;
+  height: 100%;
+  max-height: 926px;
+  /* margin: 0 auto; */
+  /* margin-top: 2vw; */
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Optional mobile-like border */
+}
