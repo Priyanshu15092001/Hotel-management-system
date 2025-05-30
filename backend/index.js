@@ -7,6 +7,7 @@ const connectToDb = require("./config/db");
 const menuRoutes = require('./routes/menuRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 const tableRoutes = require('./routes/tableRoutes')
+const chefRoutes = require('./routes/chefRoutes')
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/menu',menuRoutes)
 app.use('/api/orders',orderRoutes)
 app.use('/api/tables',tableRoutes)
+app.use('/api/chefs',chefRoutes)
 
 //connect to db and start server
 connectToDb();
