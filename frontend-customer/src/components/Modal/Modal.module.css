@@ -111,7 +111,13 @@
   }
 
   .modal {
-    position: absolute;
+    position: sticky;
+    display: none;
+  }
+
+  .active{
+    display: flex;
+    bottom: 0;
   }
 
   .content h1 {

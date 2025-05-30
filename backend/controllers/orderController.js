@@ -6,13 +6,13 @@ const {assignChefToOrder,removeOrderFromChef} = require("../utils/assignChefToOr
 
 const placeOrder = async (req, res) => {
   try {
-    const { customer, items, deliveryTime, totalPrice, diningType } = req.body;
+    const { customer, items, duration, totalPrice, diningType } = req.body;
 
     if (
       !customer.name ||
       !customer.phone ||
       !items ||
-      !deliveryTime ||
+      !duration ||
       !totalPrice ||
       !diningType
     ) {
@@ -69,6 +69,8 @@ const placeOrder = async (req, res) => {
       var tableNo = optimalCombo.map((t) => t.tableId);
     }
 
+    const deliveryTime=new Date(new Date().getTime() + duration * 60000)
+
     const newOrder = await Order.create({
       customer,
       items,
@@ -80,18 +82,18 @@ const placeOrder = async (req, res) => {
 
     // const savedOrder = await newOrder.save();
 
-    const estimatedDuration = Math.ceil(
-      (new Date(newOrder.deliveryTime) - new Date()) / (1000 * 60)
-    );
+    // const estimatedDuration = Math.ceil(
+    //   (new Date(newOrder.deliveryTime) - new Date()) / (1000 * 60)
+    // );
 
-    if (estimatedDuration < 1) estimatedDuration = 1;
+    // if (estimatedDuration < 1) estimatedDuration = 1;
 
     const assignedChefId = await assignChefToOrder(
       newOrder._id,
-      estimatedDuration
+      duration
     );
 
-    console.log(assignedChefId);
+    // console.log(assignedChefId);
 
     if (!assignedChefId) {
       return res.status(400).json({ message: "Failed to assign chef" });
@@ -121,8 +123,8 @@ const getOrders = async (req, res) => {
     const orders = await Order.find().sort({ createdAt: -1 });
     return res.status(200).json({ message: "All orders fetched", orders });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
     console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

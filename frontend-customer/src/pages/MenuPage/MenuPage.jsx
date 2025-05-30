@@ -5,12 +5,14 @@ import filters from "../../data/filters";
 import MenuItemCard from "../../components/MenuItemCard/MenuItemCard";
 import Header from "../../components/Header/Header";
 import { getMenuItem } from "../../services/index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 export default function MenuPage() {
   const [selectedCard, setSelectedCard] = useState(-1);
   const [menuItems, setMenuItems] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
+  const [searchedMenu,setSearchedMenu] = useState([])
+  
+  const [cartItems, setCartItems] = useState(JSON.parse(localStorage.getItem('cartItems'))||[]);
 
   const navigate = useNavigate();
 
@@ -23,11 +25,12 @@ export default function MenuPage() {
     if (cartItems.length == 0) {
       toast.error("No items added in cart!");
     } else
-      navigate("/confirm-order", {
-        state: {
-          cartItems
-        },
-      });
+      // navigate("/confirm-order", {
+      //   state: {
+      //     cartItems
+      //   },
+      // });
+      navigate('/confirm-order')
   };
 
   const updateCartItem = (item, quantity) => {
@@ -47,6 +50,9 @@ export default function MenuPage() {
         return updated;
       }
     });
+
+    // localStorage.setItem("cartItems",JSON.stringify(cartItems))
+
   };
 
   useEffect(() => {
@@ -57,6 +63,7 @@ export default function MenuPage() {
 
         if (response.ok) {
           setMenuItems(data.item);
+          setSearchedMenu(data.item)
         }
       })
       .catch((err) => {
@@ -64,9 +71,37 @@ export default function MenuPage() {
       });
   }, [selectedCard]);
 
+
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search')?.toLowerCase() || '';
+  
+
+   useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setSearchedMenu(menuItems);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = menuItems.filter((item, index) => {
+        const name = item?.name?.toLowerCase() || "";
+        const type = item?.type?.toLowerCase() || "";
+
+        return (
+          name.includes(query) ||
+          type.includes(query) 
+        );
+      });
+      setSearchedMenu(filtered);
+    }
+  }, [searchQuery, menuItems]);
+
+  useEffect(() => {
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+}, [cartItems,cartItems.quantity]);
+
+
   return (
     <div className={styles.menuPage}>
-      <Header />
+      <Header initialSearchText={searchQuery}/>
 
       <div className={styles.filters}>
         {filters.map((item, index) => (
@@ -82,7 +117,7 @@ export default function MenuPage() {
       <div className={styles.menuContainer}>
         <h1>{selectedCard == -1 ? "All" : filters[selectedCard].type}</h1>
         <div className={styles.menuItems}>
-          {menuItems.map((item, index) => (
+          {searchedMenu.map((item, index) => (
             <MenuItemCard
               key={index}
               item={item}

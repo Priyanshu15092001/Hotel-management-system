@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "./OrderCard.module.css";
-import pizza from "../../assets/MenuPage/BBq Mushroom.webp";
 import cancelBtn from "../../assets/ConfirmationPage/cancel.svg";
 import decreaseBtn from "../../assets/MenuPage/decreaseBtn.svg";
 import increaseBtn from "../../assets/MenuPage/increaseBtn.svg";
