@@ -1,0 +1,5 @@
+.item{
+    font-family: "Inter",sans-serif;
+    font-size: clamp(0.7rem,0.8vw,1rem);
+    /* font-size: 0.9rem; */
+}

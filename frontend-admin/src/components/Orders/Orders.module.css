@@ -1,0 +1,27 @@
+.orderContainer {
+  /* flex: 1; */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  gap: 1rem;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 1.4rem;
+  overflow: hidden;
+}
+
+.orderContainer h1 {
+  font-family: "Inter", sans-serif;
+  color: #565656;
+  font-size: clamp(1rem, 1.4vw, 2rem);
+}
+
+.orders{
+  flex:1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-content: flex-start;
+  overflow-y: auto;
+}

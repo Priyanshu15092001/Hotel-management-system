@@ -48,4 +48,20 @@ const getMenuItem = async (req, res) => {
   }
 };
 
-module.exports = { addMenuItem, getMenuItem };
+const getMenuById= async(req,res)=>{
+  try {
+    const{id}=req.params
+
+    const menuItem=await Menu.findById(id)
+
+    if(!menuItem){
+      return res.status(404).json({message:"Menu Item not found"})
+    }
+
+    return res.status(200).json({message:"Menu Item found", menuItem})
+  } catch (error) {
+    
+  }
+}
+
+module.exports = { addMenuItem, getMenuItem,getMenuById };

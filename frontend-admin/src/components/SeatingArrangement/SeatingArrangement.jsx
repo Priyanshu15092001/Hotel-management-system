@@ -7,7 +7,7 @@ import addBtn from "../../assets/SeatingArrangement/addBtn.svg";
 import AddTableCard from "../AddTableCard/AddTableCard";
 export default function SeatingArrangement() {
   const [tables, setTables] = useState([]);
-  const [newTable, setNewTable] = useState({ occupancy: 2, name: "" });
+  const [newTable, setNewTable] = useState({ tableId:0,occupancy: 2, name: "" });
   const [openModal, setOpenModal] = useState(false);
   const [searchedTable, setSearchedTable] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +17,8 @@ export default function SeatingArrangement() {
       .then(async (response) => {
         const data = await response.json();
         if (response.ok) {
+          console.log(data);
+          
           setTables(data.tables);
           setSearchedTable(data.tables);
         } else {
@@ -48,6 +50,11 @@ export default function SeatingArrangement() {
     }
   }, [searchQuery, tables]);
 
+  useEffect(() => {
+    setNewTable({ tableId:tables.length+1,occupancy: 2, name: "" });
+    
+  }, [tables]);
+
   const handleOpen = (e) => {
     e.preventDefault();
     setOpenModal(true);
@@ -55,13 +62,15 @@ export default function SeatingArrangement() {
 
   const handleCreate = (e) => {
     e.preventDefault();
+    console.log("Add",newTable);
     addTable(newTable)
       .then(async (response) => {
         const data = await response.json();
         if (response.ok) {
           toast.success(data.message);
+          
+          // setNewTable({ tableId:tables.length+2,occupancy: 2, name: "" });
           setTables((prev) => [...prev, data.newTable]);
-          setNewTable({ occupancy: 2, name: "" });
           setOpenModal(!openModal);
         } else {
           toast.error(data.message);
@@ -78,6 +87,9 @@ export default function SeatingArrangement() {
         const data = await response.json();
         if (response.ok) {
           toast.success(data.message);
+          console.log(newTable);
+          
+          // setNewTable({ tableId:tables.length-1,occupancy: 2, name: "" });
           setTables((prev) => prev.filter((table) => table._id !== id));
         } else {
           toast.error(data.message);
@@ -107,7 +119,7 @@ export default function SeatingArrangement() {
             <TableCard
               table={table}
               key={index}
-              index={tables.indexOf(table)}
+              index={index+1}
               handleDelete={handleDelete}
             />
           ))}

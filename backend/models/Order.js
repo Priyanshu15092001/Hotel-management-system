@@ -2,13 +2,34 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
-    phone: {
-      type: String,
-      required: true,
+    customer: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+      },
+      count: {
+        type: Number,
+        validate: {
+          validator: function (value) {
+            // If diningType is 'Dine in', count must be >= 1
+            if (this.diningType === "Dine in") {
+              return value >= 1;
+            }
+            // For other types, no validation needed
+            return true;
+          },
+          message: "Count must be at least 1 for Dine in orders",
+        },
+      },
     },
-    address: {
-      type: String,
-    },
+
     items: [
       {
         menuItem: {
@@ -40,9 +61,10 @@ const orderSchema = new mongoose.Schema(
       enum: ["Take Away", "Dine in"],
       required: true,
     },
+    tableBooked: [Number],
     status: {
       type: String,
-      enum: ["Done", "Processing"],
+      enum: ["Done", "Processing", "Served", "Not Picked Up"],
       default: "Processing",
     },
   },

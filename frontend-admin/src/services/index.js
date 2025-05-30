@@ -52,3 +52,59 @@ export async function deleteTable(id) {
     throw error
   }
 }
+
+
+export async function getOrders(){
+  try {
+    const res= await fetch(`${URL}/api/orders`,{
+      method:"GET"
+    })
+
+    return res
+
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
+
+export async function updateOrderStatus(id,status){
+  const query = new URLSearchParams({ status });
+  try {
+    const res= await fetch(`${URL}/api/orders/${id}?${query}`,{
+      method:'PATCH'
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
+
+export async function getMenuById(id) {
+  try {
+    const res = await fetch(`${URL}/api/menu/${id}`,{
+      method:"GET"
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}
+
+export async function updateTableStatus(id,status){
+   const query = new URLSearchParams({ status });
+  try {
+    const res= await fetch(`${URL}/api/tables/${id}?${query}`,{
+      method:'PATCH'
+    })
+
+    return res
+  } catch (error) {
+    console.error(error);
+    throw error
+  }
+}

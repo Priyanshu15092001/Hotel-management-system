@@ -8,7 +8,7 @@ export default function TableCard({table,index,handleDelete}) {
         <img src={deleteBtn} className={styles.deleteBtn} alt="Delete" onClick={()=>handleDelete(table._id)} />
         <div className={styles.tableName}>
             <h3>Table</h3>
-            <span>{(index+1).toString().padStart(2, '0')}</span>
+            <span>{index.toString().padStart(2, '0')}</span>
         </div>
         <div className={styles.occupancy}>
             <img src={chairIcon} alt="Chair" />
