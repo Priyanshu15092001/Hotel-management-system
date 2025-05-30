@@ -6,7 +6,7 @@ const InstructionModal = ({
   onClose,
   instructions,
   setInstructions,
-  onSubmitInstructions
+  onSubmitInstructions,
 }) => {
   return (
     <>
@@ -66,7 +66,10 @@ const InputModal = ({
         <img
           src={closeBtn}
           className={styles.closeBtn}
-          onClick={()=>{onClose(); setCustomer({name:"",phone:"",address:"",count:1})}}
+          onClick={() => {
+            onClose();
+            setCustomer({ name: "", phone: "", address: "", count: 1 });
+          }}
           alt=""
         />
         <div className={styles.inputContent}>
@@ -90,7 +93,9 @@ const InputModal = ({
           <div className={styles.formGroup}>
             <label htmlFor="userPhone">Phone</label>
             <input
-              type="text"
+              type="tel"
+              maxLength="10"
+              pattern="\d{10}"
               name="userPhone"
               value={customer.phone}
               onChange={(e) =>
@@ -120,7 +125,7 @@ const InputModal = ({
             <div className={styles.formGroup}>
               <label htmlFor="userCount">No. of persons</label>
               <input
-                type='number'
+                type="number"
                 min={1}
                 name="userCount"
                 value={customer.count}
@@ -136,7 +141,7 @@ const InputModal = ({
           <div className={styles.buttons}>
             <button
               onClick={() => {
-                setCustomer({name:"",phone:"",address:"",count:0})
+                setCustomer({ name: "", phone: "", address: "", count: 0 });
                 onClose();
               }}
               className={styles.cancel}

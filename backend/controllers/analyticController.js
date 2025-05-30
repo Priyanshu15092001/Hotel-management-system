@@ -98,7 +98,7 @@ const getRevenueGrowth = async(req,res)=>{
     }
 
     const now = new Date();
-    const matchStage = {}; // Optional future use for filtering
+    const matchStage = {}; 
 
     let groupStage, projectStage;
 

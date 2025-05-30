@@ -24,14 +24,11 @@ export default function ConfirmationPage() {
   const location = useLocation();
   const navigate = useNavigate();
   // const [cartItems, setCartItems] = useState(location.state?.cartItems || []);
-  const[cartItems,setCartItems]= useState(JSON.parse(localStorage.getItem('cartItems'))||[])
+  const [cartItems, setCartItems] = useState(
+    JSON.parse(localStorage.getItem("cartItems")) || []
+  );
 
-  const [customer, setCustomer] = useState({
-    name: JSON.parse(localStorage.getItem("customer"))?.name || "",
-    phone: JSON.parse(localStorage.getItem("customer"))?.phone || "",
-    address: JSON.parse(localStorage.getItem("customer"))?.address || "",
-    count: 1,
-  });
+  const [customer, setCustomer] = useState(JSON.parse(localStorage.getItem('customer'))||{name:'',phone:'',address:'',count:1});
 
   const [totalPrice, setTotalPrice] = useState(
     JSON.parse(localStorage.getItem("totalPrice")) || {
@@ -43,7 +40,9 @@ export default function ConfirmationPage() {
   const [duration, setDuration] = useState(
     localStorage.getItem("orderDuration") || 0
   );
-  const [instructions, setInstructions] = useState(localStorage.getItem('instructions')||'');
+  const [instructions, setInstructions] = useState(
+    localStorage.getItem("instructions") || ""
+  );
 
   useEffect(() => {
     if (cartItems.length == 0) {
@@ -53,7 +52,11 @@ export default function ConfirmationPage() {
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems,cartItems.quantity]);
+  }, [cartItems, cartItems.quantity]);
+
+  useEffect(() => {
+    localStorage.setItem("diningType", selected);
+  }, [selected]);
 
   useEffect(() => {
     if (duration <= 0) return;
@@ -78,14 +81,12 @@ export default function ConfirmationPage() {
     // console.log('total price', calculatePrice());
 
     localStorage.setItem("totalPrice", JSON.stringify(calculatePrice()));
-    // if (!localStorage.getItem("totalPrice"))
-    // setDuration(
-    //   localStorage.getItem("orderDuration") || calculateCookingTime()
-    // );
-
-    setDuration(calculateCookingTime())
-    localStorage.setItem('orderDuration',JSON.stringify(calculateCookingTime()))
-
+   
+    setDuration(calculateCookingTime());
+    localStorage.setItem(
+      "orderDuration",
+      JSON.stringify(calculateCookingTime())
+    );
   }, [cartItems, cartItems.quantity, selected]);
 
   const confirmOrder = () => {
@@ -93,7 +94,7 @@ export default function ConfirmationPage() {
     // console.log(customer);
 
     details.customer = JSON.parse(localStorage.getItem("customer"));
-    if (selected === "Take Away") {
+    if (localStorage.getItem('diningType') === "Take Away") {
       delete details.customer.count;
     } else {
       delete details.customer.address;
@@ -111,16 +112,14 @@ export default function ConfirmationPage() {
       }
     });
     details.items = items;
-    details.instructions = localStorage.getItem('instructions');
+    details.instructions = localStorage.getItem("instructions");
     details.totalPrice = JSON.parse(
       localStorage.getItem("totalPrice")
     ).totalPrice;
-    details.diningType = selected;
-    // console.log(duration);
-
-    // details.deliveryTime = new Date(new Date().getTime() + duration * 60000);
-    details.duration = localStorage.getItem('orderDuration');
-    // console.log(details);
+    details.diningType = localStorage.getItem('diningType');
+    
+    details.duration = localStorage.getItem("orderDuration");
+    console.log(details);
 
     addOrder(details)
       .then(async (response) => {
@@ -132,8 +131,6 @@ export default function ConfirmationPage() {
           setConfirmed(true);
           localStorage.setItem("orderDuration", duration);
           localStorage.setItem("orderConfirmed", true);
-          // localStorage.setItem("customer", JSON.stringify(customer));
-          localStorage.setItem("diningType", selected);
           setSwipeText("Order Confirmed");
         } else {
           toast.error(data.message);
@@ -276,11 +273,11 @@ export default function ConfirmationPage() {
     setIsOpenInputModal(false);
   };
 
-  const handleInstructionSubmit=(e)=>{
-    e.preventDefault()
-    localStorage.setItem('instructions',instructions)
-    setIsOpen(false)
-  }
+  const handleInstructionSubmit = (e) => {
+    e.preventDefault();
+    localStorage.setItem("instructions", instructions);
+    setIsOpen(false);
+  };
 
   return (
     <div className={styles.confirmPage}>
